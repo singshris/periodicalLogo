@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+    </head>
+    <body>
+        <section class="logoCanvas">
+            <h1>1973</h1>
+        </section>
+        <div class="controls">
+    <div style="display: flex; flex-direction: row; justify-content: space-around; align-items: center; width: 30%; height: 30px; padding: 0.4em; background: #FFFBF2; border: 2px solid; border-color: #4D3DD7; border-radius: 50px;">
+        <label for="yearSlider" style="color: #4D3DD7; font-weight: 600; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"> Pick a Year</label><br>
+        <input type="range" class ="slider" id="yearSlider" min="1973" max="2023" step="1" value="1973"  onclick="fetchData()">
+    </div>
+    <div>
+        <!-- <button id="bgBtn" > See the Stars </button> -->
+        <button id="moveBtn"> Start Animation </button>
+        <button id="chaosBtn"> Freestyle </button>
+        <!-- <button id="colorBtn"> Save </button> -->
+    </div>
+        </div>
+
+    <div>
+        <h2><span style="font-weight: 600">Here is a logo, mapped to the stars.</span>
+            <br>
+            <br>To celebrate ASTRONOMY magazine's 50th anniversary, we bring you a generator 
+            that creates 50 variations on the astronomy logo based off of the positions of our 9 planets in each year.</h2>
+    </div>
+        <!-- <script src="sketch.js" async defer></script> -->
+        <script src="script.js" async defer></script>
+    </body>
+</html>
