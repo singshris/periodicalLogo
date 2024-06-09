@@ -5,7 +5,7 @@ const moveButton = document.getElementById("moveBtn");
 const chaos = document.getElementById("chaosBtn");
 const heading = document.querySelector("h1");
 const bgBody = document.querySelector("body");
-
+const randomPos = Math.floor(Math.random() * -1200);
 let year;
 let myData;
 let logos = ["A", "S", "T", "R", "O", "N", "O", "M", "Y"];
@@ -47,11 +47,12 @@ async function fetchData() {
         continue;
       }
       xPos = Math.round(myData[i].cells[0].position.equatorial.rightAscension.hours);
-      yPos = Math.round(myData[i].cells[0].position.equatorial.declination.degrees);
+      yPos = Math.round(Math.abs(myData[i].cells[0].position.equatorial.declination.degrees));
       planetName = data.data.table.rows[i].cells[0].id;
       alt = Math.floor(Math.abs((data.data.table.rows[i].cells[0].position.horizonal.altitude.degrees)));
       positionsArray.push({ xPos, yPos, alt, planetName });
     }
+    console.log(positionsArray);
 
     positionsArray.sort((a, b) => a.xPos - b.xPos);
     canvas.innerHTML = '';
@@ -61,13 +62,11 @@ async function fetchData() {
       let y = positionsArray[i].yPos;
       let moveY = positionsArray[i].alt;
       let planet = positionsArray[i].planetName;
-      console.log(planet);
-      
 
       let logo = logos[i];
       let minLatitudeDifference = (canvas.clientHeight-20) / (positionsArray.length - 1);
       // minLatitudeDifference = minLatitudeDifference*0.8;
-      let newxPos = map(x, 0, 24, Math.floor(canvas.clientWidth)/30, Math.floor(canvas.clientWidth)-Math.floor(canvas.clientWidth)/30);
+      let newxPos = map(x, 0, 24, 150, Math.floor(canvas.clientWidth)-150);
       newxPos += i * minLatitudeDifference;
       console.log(x, y);
       // if (i > 0) {
@@ -79,22 +78,34 @@ async function fetchData() {
       //   }
       // }
       let newSize = map(moveY, 0, 30, 20, 120);
-      let newyPos = map(y, -24, 24, Math.floor(canvas.clientHeight)/2 - 100, Math.floor(canvas.clientHeight) + 80);
+      let newyPos = map(y, 0, 24, Math.floor(canvas.clientHeight)/2-150, Math.floor(canvas.clientHeight)/2+150);
 
       let dataElem = document.createElement("DIV");
       dataElem.classList.add("star");
       dataElem.innerHTML = logo;
       dataElem.style.left = Math.floor(newxPos) + "px";
       dataElem.style.top = Math.abs(newyPos) + "px";
-     
+
       dataElem.style.animation = `floatAnimation-${i} 1s 1 alternate `; // Unique animation name for each element
+
+
+
 
       dataElem.addEventListener("mouseenter", () =>{
         let planetInfo = document.createElement('p');
-        planetInfo.innerHTML = planet.toUpperCase() + "<br>" + x + " Right Ascension "  +  y + " Declination";
+        planetInfo.innerHTML = planet.toUpperCase() + "<br>" + x + " Right Ascension "  + "<br>" +  -y + " Declination";
         // planetInfo.innerHTML = `url(${planet}.png)`;
         // dataElem.style.color = "#E5FF61";
-        dataElem.innerHTML = `<img src="planets/${planet}.png" alt="${planet} image" style="width: 12rem; height: auto;">`;
+        dataElem.innerHTML = `<img id="planetImg" src="planets/${planet}.png" alt="${planet} image" style="width: 1px; height: auto;">`;
+
+        const img = document.getElementById('planetImg');
+
+        img.onload = function() {
+        const originalWidth = img.naturalWidth;
+        img.style.width = originalWidth * 0.4 + 'px';
+        img.style.height = 'auto';
+        };
+
         dataElem.style.cursor = "pointer";
         dataElem.appendChild(planetInfo);
       })
@@ -187,3 +198,18 @@ function map(value, low1, high1, low2, high2) {
 }
 
   
+const extractZValueFromTransform = (transformValue) => {
+  const matrix = transformValue.match(/matrix.*\((.+)\)/);
+  if (matrix) {
+    const values = matrix[1].split(", ");
+    if (values.length === 16) {
+      // For matrix3d
+      return parseFloat(values[14]);
+    } else if (values.length === 6) {
+      // For matrix (2D transform), z value is 0
+      return 0;
+    }
+  }
+  return null;
+};
+

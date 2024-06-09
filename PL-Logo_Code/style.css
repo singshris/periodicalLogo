@@ -88,7 +88,7 @@ p{
   height: 40vw;
   padding: 1rem;
   overflow:hidden;
-  
+  /* transform-style: preserve-3d; */
 }
 
 .controls{
@@ -124,7 +124,10 @@ p{
   margin-right: 1rem;
   font-family: alti;
   color: var(--bg-color);
+  align-self: center;
   /* transition: 0.2s ease-in-out; */
+  filter: drop-shadow(4px 4px 4px rgb(26, 26, 26));
+
 }
 
 .slider {
