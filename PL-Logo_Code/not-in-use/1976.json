@@ -1,0 +1,58 @@
+{
+    "stars": [
+        {
+            "name": "sun",
+            "ra": "12",
+            "dec": "4",
+            "alt": "3"
+        },
+        {
+            "name": "mercury",
+            "ra": "13",
+            "dec": "13",
+            "alt": "11"
+        },
+        {
+            "name": "venus",
+            "ra": "15",
+            "dec": "20",
+            "alt": "19"
+        },
+        {
+            "name": "mars",
+            "ra": "02",
+            "dec": "11",
+            "alt": "11"
+        },
+        {
+            "name": "jupiter",
+            "ra": "20",
+            "dec": "21",
+            "alt": "20"
+        },
+        {
+            "name": "saturn",
+            "ra": "06",
+            "dec": "22",
+            "alt": "22"
+        },
+        {
+            "name": "uranus",
+            "ra": "13",
+            "dec": "9",
+            "alt": "8"
+        },
+        {
+            "name": "neptune",
+            "ra": "16",
+            "dec": "20",
+            "alt": "19"
+        },
+        {
+            "name": "pluto",
+            "ra": "12",
+            "dec": "12",
+            "alt": "13"
+        }
+    ]
+}
