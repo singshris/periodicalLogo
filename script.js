@@ -4,6 +4,8 @@ const canvas = document.querySelector(".logoCanvas");
 const moveButton = document.getElementById("moveBtn");
 const chaos = document.getElementById("chaosBtn");
 const heading = document.querySelector("h1");
+const bgBody = document.querySelector("body");
+const randomPos = Math.floor(Math.random() * -1200);
 let year;
 let myData;
 let logos = ["A", "S", "T", "R", "O", "N", "O", "M", "Y"];
@@ -13,6 +15,8 @@ let xPos, yPos, alt;
 let planetName;
 let positionsArray = [];
 let isAnimationRunning = false; // Variable to track animation state
+const maxDistance = 300 + "px";
+
 
 year = slider.value;
 slider.addEventListener("input", () => {
@@ -36,47 +40,64 @@ async function fetchData() {
 
     let data = await response.json();
     myData = data.data.table.rows;
-
+  
     for (let i = 0; i < myData.length; i++) {
       // Skip rows in the 2nd and 4th positions
       if (i === 1 || i === 4) {
         continue;
       }
-      xPos = Math.round(data.data.table.rows[i].cells[0].position.equatorial.rightAscension.hours);
-      yPos = Math.round(data.data.table.rows[i].cells[0].position.equatorial.declination.degrees);
+      xPos = Math.round(myData[i].cells[0].position.equatorial.rightAscension.hours);
+      yPos = Math.round(Math.abs(myData[i].cells[0].position.equatorial.declination.degrees));
       planetName = data.data.table.rows[i].cells[0].id;
       alt = Math.floor(Math.abs((data.data.table.rows[i].cells[0].position.horizonal.altitude.degrees)));
       positionsArray.push({ xPos, yPos, alt, planetName });
     }
+    console.log(positionsArray);
 
     positionsArray.sort((a, b) => a.xPos - b.xPos);
     canvas.innerHTML = '';
-
+ 
     for (let i = 0; i < logos.length; i++) {
       let x = positionsArray[i].xPos;
       let y = positionsArray[i].yPos;
-      let moveY = positionsArray[i].alt;
+      let z = positionsArray[i].alt;
       let planet = positionsArray[i].planetName;
-      console.log(moveY);
       let logo = logos[i];
-      let minLatitudeDifference = (canvas.clientHeight - 20) / (positionsArray.length - 1);
 
-      let newxPos = map(x, 0, 24, Math.floor(canvas.clientWidth/20), Math.floor(canvas.clientWidth/3));
+      let minLatitudeDifference = (canvas.clientHeight-20) / (positionsArray.length - 1);
+      let newxPos = map(x, 0, 24, 150, Math.floor(canvas.clientWidth)-150);
       newxPos += i * minLatitudeDifference;
-      let newSize = map(moveY, 0, 30, 20, 120);
-      let newyPos = map(y, -24, 24, canvas.clientHeight / 2 - 120, canvas.clientHeight / 2 + 120);
+      let newyPos = map(y, 0, 24, Math.floor(canvas.clientHeight)/2-150, Math.floor(canvas.clientHeight)/2+150);
+      // let newzPos = map(z, 0, 30, -500, 100);
+      let newSize = map(z, 0, 30, 2, 7);
+      console.log(x, y, z, planet);
 
       let dataElem = document.createElement("DIV");
       dataElem.classList.add("star");
       dataElem.innerHTML = logo;
-      dataElem.style.left = Math.floor(newxPos) + "px";
-      dataElem.style.top = Math.abs(newyPos) + "px";
-      dataElem.style.animation = `floatAnimation-${i} 2s 1 alternate `; // Unique animation name for each element
+      dataElem.style.left = newxPos + "px";
+      dataElem.style.top = newyPos + "px";
+      let opacityAmount = map(z, 0, 30, 0, 1);
+      dataElem.style.opacity = opacityAmount;
+      // dataElem.style.transform = `translate3d(${newxPos}px, ${Math.abs(newyPos)}px, ${newzPos}px)`;
+      dataElem.style.fontSize = `${newSize}rem`;
+      dataElem.style.animation = `floatAnimation-${i} 1s 1 alternate `; // Unique animation name for each element
 
       dataElem.addEventListener("mouseenter", () =>{
-        let planetInfo = document.createElement("P");
-        planetInfo.innerHTML = planet.toUpperCase() + " was at " + "<br>" + x + " Right Ascension "  + "<br>" + "and " + y + " Declination";
-        dataElem.style.color = "#fedd39";
+        let planetInfo = document.createElement('p');
+        planetInfo.innerHTML = planet.toUpperCase() + "<br>" + x + " Right Ascension "  + "<br>" +  -y + " Declination";
+        // dataElem.style.color = "#E5FF61";
+        dataElem.innerHTML = `<img id="planetImg" src="planets/${planet}.png" alt="${planet} image" style="width: 1px; height: auto;">`;
+
+        const img = document.getElementById('planetImg');
+       
+ 
+        img.onload = function() {
+        const originalWidth = img.naturalWidth;
+        img.style.width = originalWidth * 0.4 + 'px';
+        img.style.height = 'auto';
+        };
+
         dataElem.style.cursor = "pointer";
         dataElem.appendChild(planetInfo);
       })
@@ -99,8 +120,6 @@ async function fetchData() {
       `);
 
       let animationName; // Variable to store the animation name
-      let currentIndex; 
-
 
       moveButton.addEventListener("click", () => {
         // Toggle the animation state
@@ -109,11 +128,11 @@ async function fetchData() {
         if (isAnimationRunning) {
           // Start the animation
           animationName = "floatAnimation";
-          moveButton.innerHTML = "Stop Animation"; // Optionally update the button text
+          moveButton.innerHTML = "Static"; // Optionally update the button text
         } else {
           // Stop the animation
           animationName = null;
-          moveButton.innerHTML = "Start Animation"; // Optionally update the button text
+          moveButton.innerHTML = "Float"; // Optionally update the button text
         }
       
         // Apply the animation to all star elements
@@ -130,36 +149,35 @@ async function fetchData() {
               0% {
                 transform: translateX(-${newSize}px);
                 transform: translateY(-${newSize}px);
-                skewX(150deg);
              50%{
                 transform: translateX(0);
                 transform: translateY(0);
-                skew(0deg, 0deg);
              }
               }
               100% {
                   transform: translateX(${newSize}px);
                   transform: translateY(${newSize}px);
-                  skewY(-150deg);
               }
             }
           `);
         }
       });
 
-
+      let isImageSet = false;
       chaos.addEventListener("click", () => {
-        dataElem.style.left = `Math.floor(${Math.random() * canvas.clientWidth})px`;
-        dataElem.style.top = `Math.abs(${Math.random() * canvas.clientHeight})px`;
-        dataElem.style.transform = `rotate(${Math.random() * newSize}deg)`;
-        dataElem.style.fontSize = newSize + "px";
-        dataElem.style.color = palette[Math.floor(Math.random()*palette.length)];
-        // dataElem.style.transform = "skewX(20deg)"
+        if (!isImageSet) {
+          bgBody.style.background = `url('space.jpg')`;
+          bgBody.style.backgroundSize = "cover";
+          canvas.style.background = "none";
+          chaos.innerHTML = "Not In Space";
+        } else {
+          // Change to background color (modify the color as needed)
+          bgBody.style.background = "#191516";
+          chaos.innerHTML = "In Space";
+        }
+        isImageSet = !isImageSet;
     })
-
-
-      canvas.appendChild(heading);
-      canvas.appendChild(dataElem);
+    canvas.appendChild(dataElem);
     }
     positionsArray = [];
   } catch (error) {
@@ -171,26 +189,19 @@ function map(value, low1, high1, low2, high2) {
   return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
 
-
   
-function colorChange() {
-    const dataElems = document.getElementsByClassName("star");
-    const canvas = document.querySelector(".logoCanvas"); // Assuming canvas is a variable in your code
-    const modeButton = document.getElementById("colorBtn"); // Assuming colorBtn is an ID in your HTML
-    modeButton.addEventListener("click", () => {
-        console.log("button is clicked");
-        for (const dataElem of dataElems) {
-            if (canvas === "#191516") {
-              dataElem.style.color = "#191516";
-              canvas.style.background = "#FFFBF2";
-              modeButton.innerHTML = "Light Mode";
-            } else if (canvas === "#191516") {
-              dataElem.style.color = "#191516";
-              canvas.style.background = "#FFFBF2"; // Change to the desired background color
-              modeButton.innerHTML = "Dark Mode";
-            }
-          }
-    })
-   
+const extractZValueFromTransform = (transformValue) => {
+  const matrix = transformValue.match(/matrix.*\((.+)\)/);
+  if (matrix) {
+    const values = matrix[1].split(", ");
+    if (values.length === 16) {
+      // For matrix3d
+      return parseFloat(values[14]);
+    } else if (values.length === 6) {
+      // For matrix (2D transform), z value is 0
+      return 0;
+    }
   }
-  
+  return null;
+};
+
